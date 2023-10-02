@@ -1,8 +1,0 @@
-{
-    "editor.guides.bracketPairs": true,
-    "editor.acceptSuggestionOnEnter": "on",
-    "editor.inlineSuggest.enabled": false,
-    "editor.suggest.localityBonus": true,
-    "editor.suggest.matchOnWordStartOnly": true,
-    "powermode.enabled": false
-}
