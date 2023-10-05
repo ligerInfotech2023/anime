@@ -3,16 +3,21 @@ const {downloadAndSaveFile} = require('../helper/downloadAndSaveFile');
 const { getPagination } = require('../helper/utils');
 
 
+
 const getTrayAndStickerDataList = async(req, res) => {
     try{
         const localBaseUrl = process.env.localBaseUrl;
         const liveBaseUrl = process.env.LiveServerUrl
         const page = req.params.page;
         const size = req.params.size;
-
+        const searchName  = req.query.search;
         const { limit, offset } = getPagination(page, size || 10)
-
-        const findData = await StickerSchema.find({})
+        let findQuery = {}
+        if(searchName){
+            const escapedSearchName  = searchName.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
+            findQuery.name = {$regex:new RegExp(escapedSearchName, "i")}
+        }
+        const findData = await StickerSchema.find(findQuery)
         .select('-_id')
         .skip(offset).limit(limit)
 
@@ -54,8 +59,6 @@ const getTrayAndStickerDataList = async(req, res) => {
                     }; 
                 })
             }
-    
-//${encodeURIComponent(data.name)}/${data.name.includes(" ") ? data.name.replace(/[ \/:*?"<>|]/g,'_') :encodeURIComponent( data.name)}_stickers_image_file/${encodeURIComponent(item.image_file)}
         
         })
         res.status(200).json(responseData)
