@@ -7,12 +7,10 @@ const PreviewWallSchema = require('../models/previewWallSchema');
 
 const getImageVideoList = async(req, res) => {
       try{
-        // const baseUrl = process.env.imageVideoLocalBaseUrl
         const liveBaseUrl = process.env.LiveServerUrl
-        const imagePath = path.join(process.cwd(), './public/downloaded_media/jpeg')
         const page  = req.params.page;
         const size = req.params.size;
-        const totalItems = 30
+        const search = req.query.search;
         const { limit, offset } = getPagination(page, size || 30)
 
         const kind = req.query.kind;
@@ -22,7 +20,14 @@ const getImageVideoList = async(req, res) => {
         } else if(kind == 'video'){
           query = {kind:'video'}
         }
+        if(search){
+          const escapedSearchName = search.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$g')
+          query.title = {$regex: new RegExp(escapedSearchName, "i")}
+        }
         const findData = await FileSchema.find(query).skip(offset).limit(limit)
+        if(!findData || findData.length === 0){
+          return res.status(404).json({status:false, message:"No data to show"})
+        }
         const dataObject = findData.map((data) => ({
             kind: data.kind,
             title: data.title,
