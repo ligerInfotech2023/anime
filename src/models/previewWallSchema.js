@@ -2,13 +2,8 @@ const mongoose = require('mongoose');
 
 const previewWallSchema = new mongoose.Schema(
     {
-        image_name: {
-            type: String,
-          },
-          isPreview: {
-            type: Boolean,
-            default: false,
-          },
+        preview_image_name: String,
+        main_image_name: String
     },
     {
         collection:"tbl_previewImage",

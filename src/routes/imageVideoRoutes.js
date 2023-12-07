@@ -2,10 +2,10 @@ const express = require('express');
 const routes = express.Router();
 const path = require('path')
 
-const {getImageVideoList, AddpreviewMainImage, previewMainImageList } = require('../controllers/imageVideoController')
+const {getImageVideoList, addPreviewMainImage, getPreviewMainImageList } = require('../controllers/imageVideoController')
 
 routes.get('/all/created/:page/:size?', getImageVideoList)
-routes.post('/add/image', AddpreviewMainImage )
-routes.get('/image/list/:page/:size?', previewMainImageList)
+routes.post('/add/image', addPreviewMainImage )
+routes.get('/image/list/:page/:size?', getPreviewMainImageList)
 
 module.exports = routes;
