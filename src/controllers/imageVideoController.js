@@ -24,11 +24,42 @@ const getImageVideoList = async(req, res) => {
           const escapedSearchName = search.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$g')
           query.title = {$regex: new RegExp(escapedSearchName, "i")}
         }
-        const findData = await FileSchema.find(query).skip(offset).limit(limit)
+        const findData = await FileSchema.find(query).lean()  //.skip(offset).limit(limit)
         if(!findData || findData.length === 0){
           return res.status(404).json({status:false, message:"No data to show"})
         }
-        const dataObject = findData.map((data) => ({
+
+        //name of images/videos that is move to the last page
+        const nameToMove = [
+          'Naruto_AMV_a7147f8a3cf85e91a1f0d33175892d83.mp4',
+          'Anime_AMV_fe8cc20cb8ca2764b0126e71be9c73f2.mp4',
+          'Tokyo_ghoul_13bc92be3a2517bf558252192e02c849.mp4',
+          'Naruto_Eyes_d1f393e373957654eef5d4b6b4e7e3ee.mp4',
+          'Anime_AMV_d66a5ae2f291387d642e56aaf00508b2.mp4',
+          'Anime_AMV_7a17ef93f6b11ada9fa4673ffcaf636a.mp4',
+          'Otsosuki_Family_e8a32e6330e9293b0ff479965ce6150f.mp4',
+          'ola_star_3635115b0bbd6d40545d5f6910d47ca4.mp4',
+          'Hanser_1b2a593fde678441c928cde5634f8594.mp4',
+          'Anime_AMV_45fb4ca1ddc19955649c0f98188816e8.mp4',
+          'Angle_Beats_7704c58dfbaaf9f5a1e3c1356e428b4f.mp4',
+          'Anime_AMV_c88450aa15df9bb30cc70927749c5cd1.mp4',
+          'Pokemon_8d56ab961b7bdf478151356772bbb527.mp4',
+          'Anime_AMV_97c749141da4b81c63223808aa497088.mp4',
+          'Death_Note_570a550aa88a6b22639c1f2fdeb734a9.mp4',
+        ]
+       
+        const necesssaryData = findData.filter(data => !nameToMove.includes(data.original));
+        const dataToMove = findData.filter(data => nameToMove.includes(data.original))
+       
+        const finalData = [...necesssaryData, ...dataToMove]
+
+        if(offset >= finalData.length){
+          return res.status(404).json({status:false, message:"No data to show"})
+        }
+        const adjustOffset = Math.min(offset, Math.max(0,finalData.length - limit))
+        const paginatedData = finalData.slice(adjustOffset, adjustOffset + limit)
+
+        const dataObject = paginatedData.map((data) => ({
             kind: data.kind,
             title: data.title,
             premium: data.premium,
